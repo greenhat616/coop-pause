@@ -11,7 +11,7 @@ import necesse.engine.network.server.Server;
 import necesse.engine.network.server.ServerClient;
 
 /**
- * {@code /unpause}: resumes a world paused with {@code /pause}.
+ * {@code /unpause}: resumes a world paused with {@code /pause}, or by the AFK monitor.
  *
  * <p>Works while paused because chat commands arrive as packets, and the server drains packets in
  * {@code Server.frameTick} whether or not the world is paused.
@@ -19,7 +19,7 @@ import necesse.engine.network.server.ServerClient;
 public class UnpauseCommand extends ModularChatCommand {
 
     public UnpauseCommand() {
-        super("unpause", "Resumes a world paused with /pause", PermissionLevel.ADMIN, false, new CmdParameter[0]);
+        super("unpause", "Resumes a world paused with /pause or by AFK auto-pause", PermissionLevel.ADMIN, false, new CmdParameter[0]);
     }
 
     @Override

@@ -2,6 +2,9 @@
 paused=World paused by <name>. Type /unpause to resume.
 resumed=World resumed by <name>.
 alreadypaused=The world is already paused by <name>.
-notpaused=The world is not paused by /pause.
+notpaused=The world is not paused by Coop Pause.
 singleplayer=Singleplayer already pauses from the menu; /pause is for multiplayer.
 stillpaused=The world is paused. Type /unpause in chat to resume.
+afkpaused=Everyone is AFK, so the world paused itself. Press any key to resume.
+afkon=Auto-pause after <minutes> minutes when all players are AFK.
+afkoff=AFK auto-pause is off.

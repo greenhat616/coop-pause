@@ -25,12 +25,13 @@ public class PauseCommand extends ModularChatCommand {
             return;
         }
 
-        if (PauseState.isPaused(server)) {
+        // An AFK pause may be turned into a manual one, so players coming back do not wake the world.
+        if (PauseState.isPaused(server, PauseState.Mode.MANUAL)) {
             logs.add(new LocalMessage("cooppause", "alreadypaused", "name", PauseState.getPausedBy()));
             return;
         }
 
-        PauseState.pause(server, issuerName(serverClient));
+        PauseState.pause(server, issuerName(serverClient), PauseState.Mode.MANUAL);
         logs.addConsole("World paused by " + issuerName(serverClient));
     }
 

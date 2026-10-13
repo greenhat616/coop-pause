@@ -304,3 +304,17 @@ coopause/
 - **服务端用黑名单，没有用 §5.3 写的白名单。** 理由：暂停期间加入或保持在线的玩家需要连接握手、区域、Level、Mob 数据请求、聊天、设置等大量数据包，白名单漏掉任何一个都会卡住加载；而需要拦截的玩家操作数量有限、容易列全。核实结果：只有 `PacketPing`、`PacketServerStatusRequest`、`PacketNetworkUpdate` 注册为 processInstantly，其余数据包都经过 `Server.processPacket`，所以这个补丁覆盖得到所有玩法包。
 - 冒烟测试（独立服务器）：日志中 3 个补丁都显示 `transformed`，包括私有方法 `Server.processPacket(NetworkPacket)`；`MainGame` 补丁在服务端只是被织入、不会执行，没有报错；`pause` / `unpause` 正常。
 - ⏳ 待在游戏里实测：暂停菜单显示时聊天框能否打开并输入 `/unpause`；Esc 和「继续」按钮是否被拦截；暂停期间加入的玩家是否停在菜单；房主（Host World）这一侧的表现。
+
+### 9.2 全员挂机自动暂停（v1.2）
+
+设计要点：
+
+- **活动由客户端上报，服务端不从玩法数据包推断。** 依据：`Client.tick` 中即使玩家站着不动，也会每 2 秒发送一次移动包（`movementTimer > 2000`），无法区分有没有人；而且挂机暂停期间，玩家回来按的那一下键可能根本不产生玩法数据包。所以客户端在 `MainGame.frameTick` 结束时检查本帧的输入事件（键盘、鼠标点击、滚轮、手柄；窗口必须有焦点；鼠标移动不算），发送 `PacketCoopActivity`。
+- **暂停分两种模式**（`PauseState.Mode`）：`MANUAL` 会把客户端锁在暂停菜单；`AFK` 只冻结世界、不锁菜单，任何玩家有活动就恢复。挂机暂停期间输入 `/pause` 会转为 `MANUAL`。状态数据包里多了一个模式字段。
+- **检查放在 `Server.tick` 补丁里**，每 20 tick（约 1 秒）检查一次。`Server.tick` 在暂停期间仍然运行，但只要 `server.isPaused()` 为真就跳过检查，因此不会和原版的无人暂停、角色生成暂停冲突，也不会把它们当成自己发起的暂停。
+- 玩家连接时把最近活动时间记为当前时间，断开时删除记录；停服时清空。
+- 设置通过 `ModSettings` 保存。参照原版 `pausewhenempty` 的做法：独立服务器调用 `saveServerSettings`，房主调用 `saveClientSettings`，两者都会写入各个 Mod 的配置文件。
+
+验证：
+- ✅ 独立服务器冒烟测试：4 个补丁都显示 `transformed`；`afkpause`（查询）→ `afkpause 1` → `pause` → `unpause` → `afkpause 0` → `afkpause 3` 输出都正确；停服后 `cfg/mods/a632079.cooppause.cfg` 中为 `afkMinutes = 3`。
+- ⏳ 「所有人超时 → 自动暂停 → 按键唤醒」整条链路需要真实客户端，尚未实测（无界面服务器上没有玩家，检查不会触发）。

@@ -2,6 +2,9 @@
 paused=世界已被 <name> 暂停。输入 /unpause 恢复。
 resumed=世界已被 <name> 恢复。
 alreadypaused=世界已被 <name> 暂停。
-notpaused=世界当前没有通过 /pause 暂停。
+notpaused=世界当前没有被 Coop Pause 暂停。
 singleplayer=单人模式打开菜单即可暂停；/pause 用于多人联机。
 stillpaused=世界仍处于暂停状态。在聊天框输入 /unpause 恢复。
+afkpaused=所有玩家都已挂机，世界已自动暂停。按任意键恢复。
+afkon=所有玩家挂机 <minutes> 分钟后自动暂停。
+afkoff=挂机自动暂停已关闭。

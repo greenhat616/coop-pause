@@ -8,18 +8,24 @@ import necesse.engine.state.State;
 import necesse.gfx.GameColor;
 
 /**
- * Client-side half of a pause: freezes local simulation and holds the game in its pause menu.
+ * Client-side half of a pause: freezes local simulation and, for a manual pause, holds the game in its pause menu.
  *
  * <p>Holding the menu is what blocks input. {@code MainGame} only runs player controls, attacks and item use
  * while {@code isRunning()}, and the form manager hides the toolbar and inventory when it is not; the same
  * state the engine enters on focus loss. Chat stays usable, so {@code /unpause} can still be typed.
+ *
+ * <p>An AFK pause does not hold the menu: the player must be able to wake the world just by pressing something
+ * (see {@link ClientActivity}). Actions taken in that moment are dropped by the server's packet filter.
  *
  * <p>Methods are public because the patches that call them are inlined into game classes.
  */
 public final class ClientPauseState {
 
     private static Client pausedClient;
-    /** Whether the game was running when the pause arrived, so resuming does not close a menu the player opened. */
+    private static PauseState.Mode mode;
+    /** Whether this class put the game into its menu, and so must take it out again on resume. */
+    private static boolean holdingMenu;
+    /** Whether the game was running when the menu was first held, so resuming does not close a menu the player opened. */
     private static boolean resumeRunning = true;
     private static long lastBlockedHint;
 
@@ -30,32 +36,45 @@ public final class ClientPauseState {
         return client != null && pausedClient == client;
     }
 
-    public static void pause(Client client) {
-        MainGame mainGame = mainGameOf(client);
+    public static boolean isPaused(Client client, PauseState.Mode expected) {
+        return isPaused(client) && mode == expected;
+    }
+
+    public static void pause(Client client, PauseState.Mode newMode) {
         if (!isPaused(client)) {
-            resumeRunning = mainGame == null || mainGame.isRunning();
+            holdingMenu = false;
         }
 
         pausedClient = client;
+        mode = newMode;
         client.pause();
+
+        MainGame mainGame = mainGameOf(client);
+        if (newMode == PauseState.Mode.MANUAL && !holdingMenu) {
+            resumeRunning = mainGame == null || mainGame.isRunning();
+            holdingMenu = true;
+        }
+
         enforce(mainGame);
     }
 
     public static void resume(Client client) {
-        boolean wasPaused = isPaused(client);
-        if (wasPaused) {
+        boolean releaseMenu = isPaused(client) && holdingMenu && resumeRunning;
+        if (isPaused(client)) {
             pausedClient = null;
+            mode = null;
+            holdingMenu = false;
         }
 
         client.resume();
         MainGame mainGame = mainGameOf(client);
-        if (wasPaused && resumeRunning && mainGame != null) {
+        if (releaseMenu && mainGame != null) {
             mainGame.setRunning(true);
         }
     }
 
     /**
-     * Puts the game back into its menu if anything took it out while paused.
+     * Puts the game back into its menu if anything took it out during a manual pause.
      *
      * <p>Called every frame as well as on pause, because a player who joins a paused world receives the pause
      * before {@code MainGame} exists, and a running state can come from paths other than {@code setRunning}.
@@ -66,7 +85,7 @@ public final class ClientPauseState {
         }
 
         Client client = mainGame.getClient();
-        if (!isPaused(client)) {
+        if (!isPaused(client) || !holdingMenu) {
             return;
         }
 
@@ -80,7 +99,7 @@ public final class ClientPauseState {
 
     /** Whether {@code MainGame.setRunning(true)} must be refused, telling the player why at most every few seconds. */
     public static boolean blocksResume(Client client) {
-        if (!isPaused(client)) {
+        if (!isPaused(client) || !holdingMenu) {
             return false;
         }
 

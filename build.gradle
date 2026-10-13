@@ -7,9 +7,9 @@ plugins {
 
 project.ext.modID = "a632079.cooppause" // The unique id of your mod. Must be all lowercase and cannot use special characters.
 project.ext.modName = "Coop Pause" // The display name of your mod.
-project.ext.modVersion = "1.1" // Your current builds version. Must follow the xx.xx... format.
+project.ext.modVersion = "1.2" // Your current builds version. Must follow the xx.xx... format.
 project.ext.gameVersion = "1.3.3" // The target game version.
-project.ext.modDescription = "Adds /pause and /unpause to freeze a multiplayer world while players stay connected" // Short description of what your mod is.
+project.ext.modDescription = "Freezes a multiplayer world with /pause or when all players are AFK, while everyone stays connected" // Short description of what your mod is.
 project.ext.author = "a632079" // Your name
 
 /**

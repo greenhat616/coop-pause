@@ -1,6 +1,7 @@
 package cooppause.packets;
 
 import cooppause.ClientPauseState;
+import cooppause.PauseState;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.NetworkPacket;
 import necesse.engine.network.Packet;
@@ -21,28 +22,39 @@ import necesse.gfx.GameColor;
 public class PacketCoopPauseState extends Packet {
 
     public final boolean paused;
+    /** The mode that started or, when resuming, ended; null only if the server sent no mode. */
+    public final PauseState.Mode mode;
+    /** Who paused or resumed; empty for an automatic pause. */
     public final String by;
 
     public PacketCoopPauseState(byte[] data) {
         super(data);
         PacketReader reader = new PacketReader(this);
         this.paused = reader.getNextBoolean();
+        int modeIndex = reader.getNextByteUnsigned();
+        this.mode = modeIndex < PauseState.Mode.values().length ? PauseState.Mode.values()[modeIndex] : null;
         this.by = reader.getNextString();
     }
 
-    public PacketCoopPauseState(boolean paused, String by) {
+    public PacketCoopPauseState(boolean paused, PauseState.Mode mode, String by) {
         this.paused = paused;
+        this.mode = mode;
         this.by = by == null ? "" : by;
         PacketWriter writer = new PacketWriter(this);
         writer.putNextBoolean(this.paused);
+        writer.putNextByteUnsigned(mode == null ? 255 : mode.ordinal());
         writer.putNextString(this.by);
     }
 
     @Override
     public void processClient(NetworkPacket packet, Client client) {
         if (this.paused) {
-            ClientPauseState.pause(client);
-            client.chat.addMessage(GameColor.YELLOW.getColorCode() + Localization.translate("cooppause", "paused", "name", this.by));
+            ClientPauseState.pause(client, this.mode == null ? PauseState.Mode.MANUAL : this.mode);
+            if (this.mode == PauseState.Mode.AFK) {
+                client.chat.addMessage(GameColor.YELLOW.getColorCode() + Localization.translate("cooppause", "afkpaused"));
+            } else {
+                client.chat.addMessage(GameColor.YELLOW.getColorCode() + Localization.translate("cooppause", "paused", "name", this.by));
+            }
         } else {
             ClientPauseState.resume(client);
             client.chat.addMessage(GameColor.GREEN.getColorCode() + Localization.translate("cooppause", "resumed", "name", this.by));
