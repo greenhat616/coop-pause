@@ -7,7 +7,7 @@ plugins {
 
 project.ext.modID = "a632079.cooppause" // The unique id of your mod. Must be all lowercase and cannot use special characters.
 project.ext.modName = "Coop Pause" // The display name of your mod.
-project.ext.modVersion = "1.2" // Your current builds version. Must follow the xx.xx... format.
+project.ext.modVersion = "1.3" // Your current builds version. Must follow the xx.xx... format.
 project.ext.gameVersion = "1.3.3" // The target game version.
 project.ext.modDescription = "Freezes a multiplayer world with /pause or when all players are AFK, while everyone stays connected" // Short description of what your mod is.
 project.ext.author = "a632079" // Your name
@@ -24,7 +24,8 @@ project.ext.clientside = false
  * Dependencies define the default load order of mods
  * Uncomment and configure these if your mod has dependencies
  */
-//project.ext.modDependencies = ["other.modid1", "other.modid2"]
+// Mod Settings Lib (Steam Workshop 3558238376); copy its jar into ./mods/ to compile
+project.ext.modDependencies = ["aizsave.modsettingslib"]
 //project.ext.modOptionalDependencies = ["optional.modid1", "optional.modid2"]
 
 // The path to the games install directory, modify this only if the auto-detection fails

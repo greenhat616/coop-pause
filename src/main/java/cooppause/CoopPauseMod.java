@@ -4,6 +4,8 @@ import cooppause.commands.AfkPauseCommand;
 import cooppause.commands.PauseCommand;
 import cooppause.commands.UnpauseCommand;
 import cooppause.packets.PacketCoopActivity;
+import cooppause.packets.PacketCoopPauseConfig;
+import cooppause.packets.PacketCoopPauseRequest;
 import cooppause.packets.PacketCoopPauseState;
 import necesse.engine.GameEventListener;
 import necesse.engine.GameEvents;
@@ -11,6 +13,7 @@ import necesse.engine.commands.CommandsManager;
 import necesse.engine.events.ServerClientConnectedEvent;
 import necesse.engine.events.ServerClientDisconnectEvent;
 import necesse.engine.events.ServerStopEvent;
+import necesse.engine.modLoader.ModSettings;
 import necesse.engine.modLoader.annotations.ModEntry;
 import necesse.engine.registries.PacketRegistry;
 
@@ -25,16 +28,15 @@ import necesse.engine.registries.PacketRegistry;
 @ModEntry
 public class CoopPauseMod {
 
-    public static CoopPauseSettings SETTINGS;
-
-    public CoopPauseSettings initSettings() {
-        SETTINGS = new CoopPauseSettings();
-        return SETTINGS;
+    public ModSettings initSettings() {
+        return CoopPauseConfig.create();
     }
 
     public void init() {
         PacketRegistry.registerPacket(PacketCoopPauseState.class);
         PacketRegistry.registerPacket(PacketCoopActivity.class);
+        PacketRegistry.registerPacket(PacketCoopPauseConfig.class);
+        PacketRegistry.registerPacket(PacketCoopPauseRequest.class);
 
         CommandsManager.registerServerCommand(new PauseCommand());
         CommandsManager.registerServerCommand(new UnpauseCommand());
@@ -44,6 +46,7 @@ public class CoopPauseMod {
             @Override
             public void onEvent(ServerClientConnectedEvent event) {
                 AfkMonitor.onConnect(event.client);
+                event.client.sendPacket(new PacketCoopPauseConfig(CoopPauseConfig.getAfkMinutes()));
                 // A player joining a paused world must freeze too, or their client would simulate on its own.
                 PauseState.syncTo(event.client);
             }

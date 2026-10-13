@@ -8,3 +8,16 @@ stillpaused=世界仍处于暂停状态。在聊天框输入 /unpause 恢复。
 afkpaused=所有玩家都已挂机，世界已自动暂停。按任意键恢复。
 afkon=所有玩家挂机 <minutes> 分钟后自动暂停。
 afkoff=挂机自动暂停已关闭。
+pausebutton=为所有人暂停世界
+resumebutton=恢复世界
+settingsbutton=Coop Pause 设置
+settingstitle=Coop Pause
+afkslider=挂机自动暂停（分钟）
+afksliderhint=0 为关闭。应用后立即对服务器生效。
+applybutton=应用
+nopermission=需要管理员权限才能执行此操作。
+
+[settingsui]
+cooppausesection=Coop Pause
+cooppauseafkminutes=挂机自动暂停（分钟）
+cooppauseafkhint=所有玩家都挂机这么久后自动暂停世界，0 为关闭。这里是服务器默认值；进入世界后，管理员可以在暂停菜单的「Coop Pause 设置」或用 /afkpause 实时修改。

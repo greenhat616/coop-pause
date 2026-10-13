@@ -12,3 +12,6 @@ build
 steam_appid.txt
 latest-crash.log
 .decompiled
+
+# Third-party mod jars used only for compiling; not ours to redistribute
+mods/

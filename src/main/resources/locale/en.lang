@@ -8,3 +8,16 @@ stillpaused=The world is paused. Type /unpause in chat to resume.
 afkpaused=Everyone is AFK, so the world paused itself. Press any key to resume.
 afkon=Auto-pause after <minutes> minutes when all players are AFK.
 afkoff=AFK auto-pause is off.
+pausebutton=Pause world for everyone
+resumebutton=Resume world
+settingsbutton=Coop Pause settings
+settingstitle=Coop Pause
+afkslider=AFK auto-pause (minutes)
+afksliderhint=0 turns it off. Applies to the server immediately.
+applybutton=Apply
+nopermission=You need admin permission to do this.
+
+[settingsui]
+cooppausesection=Coop Pause
+cooppauseafkminutes=AFK auto-pause (minutes)
+cooppauseafkhint=All players idle this long pauses the world; 0 turns it off. This is the server default: in a world, admins change it live from the pause menu (Coop Pause settings) or with /afkpause.

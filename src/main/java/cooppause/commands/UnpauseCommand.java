@@ -1,11 +1,10 @@
 package cooppause.commands;
 
-import cooppause.PauseState;
+import cooppause.PauseActions;
 import necesse.engine.commands.CmdParameter;
 import necesse.engine.commands.CommandLog;
 import necesse.engine.commands.ModularChatCommand;
-import necesse.engine.commands.PermissionLevel;
-import necesse.engine.localization.message.LocalMessage;
+import necesse.engine.localization.message.GameMessage;
 import necesse.engine.network.client.Client;
 import necesse.engine.network.server.Server;
 import necesse.engine.network.server.ServerClient;
@@ -19,18 +18,14 @@ import necesse.engine.network.server.ServerClient;
 public class UnpauseCommand extends ModularChatCommand {
 
     public UnpauseCommand() {
-        super("unpause", "Resumes a world paused with /pause or by AFK auto-pause", PermissionLevel.ADMIN, false, new CmdParameter[0]);
+        super("unpause", "Resumes a world paused with /pause or by AFK auto-pause", PauseActions.REQUIRED_PERMISSION, false, new CmdParameter[0]);
     }
 
     @Override
     public void runModular(Client client, Server server, ServerClient serverClient, Object[] args, String[] errors, CommandLog logs) {
-        if (!PauseState.isPaused(server)) {
-            logs.add(new LocalMessage("cooppause", "notpaused"));
-            return;
+        GameMessage refusal = PauseActions.unpause(server, serverClient);
+        if (refusal != null) {
+            logs.add(refusal);
         }
-
-        String name = PauseCommand.issuerName(serverClient);
-        PauseState.unpause(server, name);
-        logs.addConsole("World resumed by " + name);
     }
 }

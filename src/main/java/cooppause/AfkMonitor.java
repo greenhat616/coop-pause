@@ -6,7 +6,7 @@ import necesse.engine.network.server.Server;
 import necesse.engine.network.server.ServerClient;
 
 /**
- * Pauses the world when every connected player has been idle for {@link CoopPauseSettings#afkMinutes}, and
+ * Pauses the world when every connected player has been idle for {@link CoopPauseConfig#getAfkMinutes()} minutes, and
  * resumes it as soon as any of them does something.
  *
  * <p>Activity is reported by the clients themselves ({@code PacketCoopActivity}) rather than inferred from
@@ -44,7 +44,7 @@ public final class AfkMonitor {
         }
 
         tickCounter = 0;
-        int minutes = CoopPauseMod.SETTINGS == null ? 0 : CoopPauseMod.SETTINGS.afkMinutes;
+        int minutes = CoopPauseConfig.getAfkMinutes();
         // Leave any existing pause alone, including the engine's own, which would otherwise be claimed as ours.
         if (minutes <= 0 || server.isSingleplayer() || server.isPaused() || PauseState.isPaused(server)) {
             return;

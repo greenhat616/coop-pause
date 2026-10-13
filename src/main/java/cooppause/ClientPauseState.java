@@ -28,6 +28,8 @@ public final class ClientPauseState {
     /** Whether the game was running when the menu was first held, so resuming does not close a menu the player opened. */
     private static boolean resumeRunning = true;
     private static long lastBlockedHint;
+    /** The server's AFK threshold as last reported, or -1 before the first report. */
+    private static int serverAfkMinutes = -1;
 
     private ClientPauseState() {
     }
@@ -56,6 +58,7 @@ public final class ClientPauseState {
         }
 
         enforce(mainGame);
+        PauseMenuButtons.refresh(mainGame);
     }
 
     public static void resume(Client client) {
@@ -71,6 +74,17 @@ public final class ClientPauseState {
         if (releaseMenu && mainGame != null) {
             mainGame.setRunning(true);
         }
+
+        PauseMenuButtons.refresh(mainGame);
+    }
+
+    public static int getServerAfkMinutes() {
+        return serverAfkMinutes;
+    }
+
+    public static void setServerAfkMinutes(Client client, int minutes) {
+        serverAfkMinutes = minutes;
+        PauseMenuButtons.refresh(mainGameOf(client));
     }
 
     /**
@@ -112,7 +126,7 @@ public final class ClientPauseState {
         return true;
     }
 
-    private static MainGame mainGameOf(Client client) {
+    static MainGame mainGameOf(Client client) {
         State state = GlobalData.getCurrentState();
         if (state instanceof MainGame && ((MainGame) state).getClient() == client) {
             return (MainGame) state;

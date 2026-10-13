@@ -318,3 +318,29 @@ coopause/
 验证：
 - ✅ 独立服务器冒烟测试：4 个补丁都显示 `transformed`；`afkpause`（查询）→ `afkpause 1` → `pause` → `unpause` → `afkpause 0` → `afkpause 3` 输出都正确；停服后 `cfg/mods/a632079.cooppause.cfg` 中为 `afkMinutes = 3`。
 - ⏳ 「所有人超时 → 自动暂停 → 按键唤醒」整条链路需要真实客户端，尚未实测（无界面服务器上没有玩家，检查不会触发）。
+
+### 9.3 设置界面与暂停菜单按钮（v1.3）
+
+**调研：Mod Settings Lib**（AizSave，Steam 创意工坊 3558238376，mod id `aizsave.modsettingslib`，本机安装版本 1.2.7，声明的 gameVersion 为 1.0.2）。依据：GitHub `AizSave/CustomSettingsLib` 源码（最新提交 2025-10-18），以及对本机 jar 的 `javap` 反汇编，两者行为一致。注意：README 中写的 id `aizsave.customsettingslib` 与实际 `mod.info` 不符，以 jar 为准。
+
+| 能力 | 结论 |
+|---|---|
+| 设置界面 | 在原版「设置」菜单里加「Mod 设置」入口（补丁 `SettingsForm.setupMenuForm`），按 Mod 列出；支持 bool、int（输入框/滑条）、string、下拉、颜色、分隔标题、段落 |
+| 持久化 | 继承原版 `ModSettings`，写入同一个 `cfg/mods/<modid>.cfg`；点「保存」时调用 `Settings.saveClientSettings()` |
+| 客户端设置是否实时生效 | **是**：保存时 `onSave()` 把值写回设置对象，`getter` 每次都读当前值 |
+| 服务器设置是否实时生效 | **否**：`isEnabled()` 只在当前状态是 `MainMenu` 时为真，进入世界后服务器设置变成灰色、不能修改；值只在客户端出生时（`ClientClient.applySpawned` 补丁）向服务端请求一次，之后不会再同步；独立服务器没有界面，只能编辑 cfg 后重启 |
+| 带权限的操作按钮 | 不提供（它只做设置页） |
+| 依赖代价 | `clientside=false`（注册了数据包），所有玩家都必须安装 |
+
+**实现**：
+
+- 挂机分钟数改为通过 Mod Settings Lib 注册（`CoopPauseConfig`，键 `cooppauseafkminutes`，范围 0～120，标记为服务器设置），在主菜单里可以改默认值。
+- 游戏中实时修改和暂停/恢复，用自己加在暂停菜单（`PauseMenuForm.setupMainForm` 补丁）里的按钮：
+  - 「为所有人暂停世界 / 恢复世界」和「Coop Pause 设置」（滑条 + 应用）。
+  - 客户端发送 `PacketCoopPauseRequest`；服务端用 `PauseActions.hasPermission`（`PermissionLevel ≥ ADMIN`）再校验一次，与聊天指令走同一套逻辑。
+  - 服务端用 `PacketCoopPauseConfig` 在玩家连接时和设置变化时下发当前值，暂停菜单据此显示。暂停状态、设置值或本地玩家权限变化时，会重建菜单按钮。
+- 服务端**不通过库的 getter 读取**这个值：在 Host World 中，服务端线程的当前状态也是 `MainGame`，getter 会返回出生时同步的旧副本，看不到游戏中的实时修改。所以直接读设置对象（`settingsMap.get(id).getValue()`），写入时用 `changeValue` 后再保存。
+
+验证：
+- ✅ 带库的独立服务器冒烟测试：两个 Mod 都正常加载，本 Mod 的 5 个补丁和库的 4 个补丁都显示 `transformed`；`afkpause` → 5（默认），`afkpause 7` → 7，`afkpause 500` → 被限制为 120；`pause` / `unpause` 正常；cfg 中写入 `cooppauseafkminutes = 120`。首次启动时出现一条 `Could not load int cooppauseafkminutes` 警告，原因是旧 cfg 里还没有这个新键，属于正常现象。
+- ⏳ 待在游戏里实测：暂停菜单按钮的布局和位置；非管理员看到的灰色按钮和提示；设置面板的滑条和应用；主菜单「Mod 设置」页的显示。

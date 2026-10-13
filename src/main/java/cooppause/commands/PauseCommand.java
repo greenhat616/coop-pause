@@ -1,11 +1,10 @@
 package cooppause.commands;
 
-import cooppause.PauseState;
+import cooppause.PauseActions;
 import necesse.engine.commands.CmdParameter;
 import necesse.engine.commands.CommandLog;
 import necesse.engine.commands.ModularChatCommand;
-import necesse.engine.commands.PermissionLevel;
-import necesse.engine.localization.message.LocalMessage;
+import necesse.engine.localization.message.GameMessage;
 import necesse.engine.network.client.Client;
 import necesse.engine.network.server.Server;
 import necesse.engine.network.server.ServerClient;
@@ -14,28 +13,14 @@ import necesse.engine.network.server.ServerClient;
 public class PauseCommand extends ModularChatCommand {
 
     public PauseCommand() {
-        super("pause", "Pauses the world for all players until /unpause", PermissionLevel.ADMIN, false, new CmdParameter[0]);
+        super("pause", "Pauses the world for all players until /unpause", PauseActions.REQUIRED_PERMISSION, false, new CmdParameter[0]);
     }
 
     @Override
     public void runModular(Client client, Server server, ServerClient serverClient, Object[] args, String[] errors, CommandLog logs) {
-        if (server.isSingleplayer()) {
-            // Singleplayer already pauses with the menu, and the menu would resume over this anyway.
-            logs.add(new LocalMessage("cooppause", "singleplayer"));
-            return;
+        GameMessage refusal = PauseActions.pause(server, serverClient);
+        if (refusal != null) {
+            logs.add(refusal);
         }
-
-        // An AFK pause may be turned into a manual one, so players coming back do not wake the world.
-        if (PauseState.isPaused(server, PauseState.Mode.MANUAL)) {
-            logs.add(new LocalMessage("cooppause", "alreadypaused", "name", PauseState.getPausedBy()));
-            return;
-        }
-
-        PauseState.pause(server, issuerName(serverClient), PauseState.Mode.MANUAL);
-        logs.addConsole("World paused by " + issuerName(serverClient));
-    }
-
-    static String issuerName(ServerClient serverClient) {
-        return serverClient == null ? "Server" : serverClient.getName();
     }
 }
