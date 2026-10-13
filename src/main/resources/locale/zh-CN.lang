@@ -1,0 +1,6 @@
+[cooppause]
+paused=世界已被 <name> 暂停。输入 /unpause 恢复。
+resumed=世界已被 <name> 恢复。
+alreadypaused=世界已被 <name> 暂停。
+notpaused=世界当前没有通过 /pause 暂停。
+singleplayer=单人模式打开菜单即可暂停；/pause 用于多人联机。

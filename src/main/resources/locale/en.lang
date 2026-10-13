@@ -1,0 +1,6 @@
+[cooppause]
+paused=World paused by <name>. Type /unpause to resume.
+resumed=World resumed by <name>.
+alreadypaused=The world is already paused by <name>.
+notpaused=The world is not paused by /pause.
+singleplayer=Singleplayer already pauses from the menu; /pause is for multiplayer.
