@@ -4,3 +4,4 @@ resumed=World resumed by <name>.
 alreadypaused=The world is already paused by <name>.
 notpaused=The world is not paused by /pause.
 singleplayer=Singleplayer already pauses from the menu; /pause is for multiplayer.
+stillpaused=The world is paused. Type /unpause in chat to resume.

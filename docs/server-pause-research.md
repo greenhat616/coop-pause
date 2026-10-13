@@ -292,3 +292,15 @@ coopause/
 - ⏳ 尚未验证：Host World 双人联机下的实际冻结效果、长时间暂停不掉线、新玩家加入时的同步。
 
 未实现（对应 §5.3 和 §6.2 的 P2～P4）：输入屏蔽（客户端遮罩加服务端数据包白名单）、暂停前主动存档、全员 AFK 自动暂停。
+
+### 9.1 输入屏蔽（v1.1）
+
+实现时修订了 §5.3 的设计：
+
+- **客户端没有另做遮罩，而是复用原版的暂停菜单。** 依据：`MainGame` 中玩家操作（`tickControls`、`tryAttack`、`runClientInteract`）和快捷键都只在 `isRunning()` 为真时执行；`MainGameFormManager.updateActive` 在 `!isRunning` 时会隐藏工具栏、背包、合成栏；失去焦点时的自动暂停走的也是 `closeContainer` 加 `setRunning(false)`。容器窗口（focus form）不受 `isRunning` 控制，所以暂停时会先关闭它。
+  - `MainGameSetRunningPatch`：暂停期间拒绝 `setRunning(true)`，并在聊天框提示（最多每 3 秒一次）。
+  - `MainGameFrameTickPatch`：每帧检查一次，处理暂停状态在 `MainGame` 创建之前就到达的情况（暂停期间加入的玩家）。
+  - 恢复时，只有在暂停之前游戏是运行状态，才把它恢复成运行，不会把玩家自己打开的菜单关掉。
+- **服务端用黑名单，没有用 §5.3 写的白名单。** 理由：暂停期间加入或保持在线的玩家需要连接握手、区域、Level、Mob 数据请求、聊天、设置等大量数据包，白名单漏掉任何一个都会卡住加载；而需要拦截的玩家操作数量有限、容易列全。核实结果：只有 `PacketPing`、`PacketServerStatusRequest`、`PacketNetworkUpdate` 注册为 processInstantly，其余数据包都经过 `Server.processPacket`，所以这个补丁覆盖得到所有玩法包。
+- 冒烟测试（独立服务器）：日志中 3 个补丁都显示 `transformed`，包括私有方法 `Server.processPacket(NetworkPacket)`；`MainGame` 补丁在服务端只是被织入、不会执行，没有报错；`pause` / `unpause` 正常。
+- ⏳ 待在游戏里实测：暂停菜单显示时聊天框能否打开并输入 `/unpause`；Esc 和「继续」按钮是否被拦截；暂停期间加入的玩家是否停在菜单；房主（Host World）这一侧的表现。

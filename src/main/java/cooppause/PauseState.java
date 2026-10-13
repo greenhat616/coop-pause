@@ -31,6 +31,7 @@ public final class PauseState {
     public static void pause(Server server, String by) {
         pausedServer = server;
         pausedBy = by;
+        PausePacketFilter.takeDropped();
         server.pause();
         server.network.sendToAllClients(new PacketCoopPauseState(true, by));
     }
@@ -40,6 +41,11 @@ public final class PauseState {
         pausedBy = null;
         server.resume();
         server.network.sendToAllClients(new PacketCoopPauseState(false, by));
+
+        int dropped = PausePacketFilter.takeDropped();
+        if (dropped > 0) {
+            System.out.println("Coop Pause: dropped " + dropped + " player action packets while paused");
+        }
     }
 
     /** Tells a newly connected client that the world is paused, if it is. */

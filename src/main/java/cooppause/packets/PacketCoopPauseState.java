@@ -1,5 +1,6 @@
 package cooppause.packets;
 
+import cooppause.ClientPauseState;
 import necesse.engine.localization.Localization;
 import necesse.engine.network.NetworkPacket;
 import necesse.engine.network.Packet;
@@ -13,8 +14,9 @@ import necesse.gfx.GameColor;
  *
  * <p>The server alone stops simulating the world, but each client keeps predicting mobs, projectiles and its
  * own world clock locally. {@code Client.pause()} stops that local simulation while leaving packet handling
- * and the not-responding timer running, so the connection survives. On the host, the same call also reaches
- * the local server, which is harmless since the server is already paused.
+ * and the not-responding timer running, so the connection survives, and {@link ClientPauseState} holds the
+ * pause menu open to block input. On the host, the same call also reaches the local server, which is
+ * harmless since the server is already paused.
  */
 public class PacketCoopPauseState extends Packet {
 
@@ -39,10 +41,10 @@ public class PacketCoopPauseState extends Packet {
     @Override
     public void processClient(NetworkPacket packet, Client client) {
         if (this.paused) {
-            client.pause();
+            ClientPauseState.pause(client);
             client.chat.addMessage(GameColor.YELLOW.getColorCode() + Localization.translate("cooppause", "paused", "name", this.by));
         } else {
-            client.resume();
+            ClientPauseState.resume(client);
             client.chat.addMessage(GameColor.GREEN.getColorCode() + Localization.translate("cooppause", "resumed", "name", this.by));
         }
     }
