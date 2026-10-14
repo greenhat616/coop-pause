@@ -1,0 +1,59 @@
+[h1]Coop Pause[/h1]
+[b]Pause a multiplayer world for everyone, without anyone disconnecting.[/b]
+Works with Host World and dedicated servers. Requires [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3558238376]Mod Settings Lib[/url].
+
+[h2]Features[/h2]
+[list]
+[*][b]/pause[/b] and [b]/unpause[/b]: freeze mobs, settlers, crops, projectiles and world time. Connections and pings keep running, so nobody times out.
+[*]Input is blocked while paused: players are held in the pause menu, and the server drops attack, build, interact, container and crafting actions.
+[*][b]AFK auto-pause[/b]: when every player has been idle for N minutes (default 5), the world pauses itself. Any player pressing a key resumes it.
+[*][b]Pause menu controls[/b]: admins get "Pause world for everyone / Resume world" and a live settings panel right in the Esc menu.
+[*]Players who join during a pause are paused too.
+[/list]
+
+[h2]Commands (admin)[/h2]
+[list]
+[*][b]/pause[/b]: pause until /unpause
+[*][b]/unpause[/b]: resume a manual or AFK pause
+[*][b]/afkpause [minutes][/b]: show or set the AFK threshold, 0 to 120, 0 = off. Applies immediately.
+[/list]
+Defaults can also be set from Settings > Mod settings > Coop Pause in the main menu.
+
+[h2]Notes[/h2]
+[list]
+[*]Every player needs this mod and Mod Settings Lib installed.
+[*]In Host World the host is the owner and can use everything. Other players need admin ([i]/permissions[/i]).
+[*]Autosaves wait until the world resumes, since game time does not advance while paused.
+[*]Singleplayer already pauses from the menu, so /pause is for multiplayer only.
+[/list]
+
+[hr][/hr]
+
+[h1]Coop Pause 多人暂停[/h1]
+[b]为所有人暂停多人世界，而且不会有人掉线。[/b]
+支持「主持世界」和独立服务器。需要前置 [url=https://steamcommunity.com/sharedfiles/filedetails/?id=3558238376]Mod Settings Lib[/url]。
+
+[h2]功能[/h2]
+[list]
+[*][b]/pause[/b] 和 [b]/unpause[/b]：冻结怪物、NPC、作物、弹幕和世界时间；网络和心跳照常运行，不会超时掉线。
+[*]暂停期间屏蔽操作：所有玩家停在暂停菜单里，服务端也会丢弃攻击、放置、交互、容器、合成等操作。
+[*][b]全员挂机自动暂停[/b]：所有玩家闲置超过设定的分钟数（默认 5 分钟）后自动暂停；任意一名玩家按键即恢复。
+[*][b]暂停菜单按钮[/b]：管理员在 Esc 菜单里就能「为所有人暂停世界 / 恢复世界」，还能实时调整设置。
+[*]暂停期间加入的玩家也会自动进入暂停状态。
+[/list]
+
+[h2]指令（管理员）[/h2]
+[list]
+[*][b]/pause[/b]：暂停，直到输入 /unpause
+[*][b]/unpause[/b]：恢复手动暂停或挂机自动暂停
+[*][b]/afkpause [分钟][/b]：查看或设置挂机阈值，范围 0～120，0 为关闭，立即生效
+[/list]
+也可以在主菜单的「设置 → Mod 设置 → Coop Pause」中修改默认值。
+
+[h2]说明[/h2]
+[list]
+[*]所有玩家都需要安装本 Mod 和 Mod Settings Lib。
+[*]主持世界时房主就是所有者，可以使用全部功能；其他玩家需要被授予管理员权限（[i]/permissions[/i]）。
+[*]暂停期间游戏时间不前进，自动存档会推迟到恢复之后。
+[*]单人模式本来就能用菜单暂停，所以 /pause 只用于多人联机。
+[/list]

@@ -64,6 +64,10 @@ gradle runServer                   # 独立服务器
 cp "D:/Program Files (x86)/Steam/steamapps/workshop/content/1169040/3558238376/ModSettingsLib-1.0.2-1.2.7.jar" mods/
 ```
 
+## 发布
+
+见 [docs/workshop/PUBLISHING.md](docs/workshop/PUBLISHING.md)：预览图、创意工坊描述、介绍图和游戏内上传步骤。
+
 ## 已知限制
 
 - 暂停期间玩家不能关掉暂停菜单。只能打开设置或者退出游戏；恢复请在聊天框输入 `/unpause`。
